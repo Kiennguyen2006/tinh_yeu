@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Khúc Vân Anh & Nguyễn Khắc Kiên</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const words = ["Khúc Vân Anh", "Nguyễn Khắc Kiên"];
+  const colors = ["#ff69b4", "#87ceeb", "#ff1493", "#00ffff"];
+  const textParticles = [];
+  const heartParticles = [];
+
+  function random(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  class TextParticle {
+    constructor() {
+      this.text = words[Math.floor(Math.random() * words.length)];
+      this.x = random(0, canvas.width);
+      this.y = random(0, canvas.height);
+      this.fontSize = random(18, 26);
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.speedX = random(-0.3, 0.3);
+      this.speedY = random(0.3, 0.9);
+    }
+
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+
+      if (this.y > canvas.height + 20 || this.x < -200 || this.x > canvas.width + 200) {
+        this.x = random(0, canvas.width);
+        this.y = -20;
+      }
+    }
+
+    draw() {
+      ctx.fillStyle = this.color;
+      ctx.font = `${this.fontSize}px Arial`;
+      ctx.fillText(this.text, this.x, this.y);
+    }
+  }
+
+  class HeartParticle {
+    constructor() {
+      this.x = random(0, canvas.width);
+      this.y = random(0, canvas.height);
+      this.size = random(6, 16);
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.speedY = random(0.5, 1.5);
+      this.alpha = random(0.5, 1);
+    }
+
+    update() {
+      this.y += this.speedY;
+      if (this.y > canvas.height) {
+        this.y = -10;
+        this.x = random(0, canvas.width);
+      }
+    }
+
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.scale(this.size / 10, this.size / 10);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = this.alpha;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(0, -3, -5, -5, -5, -10);
+      ctx.bezierCurveTo(-5, -15, 0, -15, 0, -10);
+      ctx.bezierCurveTo(0, -15, 5, -15, 5, -10);
+      ctx.bezierCurveTo(5, -5, 0, -3, 0, 0);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  for (let i = 0; i < 150; i++) {
+    textParticles.push(new TextParticle());
+  }
+
+  for (let i = 0; i < 100; i++) {
+    heartParticles.push(new HeartParticle());
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    heartParticles.forEach(h => {
+      h.update();
+      h.draw();
+    });
+
+    textParticles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+</body>
+</html>
